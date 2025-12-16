@@ -1,0 +1,12 @@
+# Dependencias (Lo más importante)
+node_modules/
+
+# Archivos de sistema de Mac
+.DS_Store
+
+# Archivos de compilación (distribución)
+dist/
+build/
+
+# Variables de entorno (claves secretas)
+.env
