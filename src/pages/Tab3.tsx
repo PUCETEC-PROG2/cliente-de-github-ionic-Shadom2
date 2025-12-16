@@ -3,9 +3,10 @@ import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle }
 import './Tab3.css';
 import { useState } from 'react';
 import { getUserInfo } from '../services/GithubService';
+import { UserInfo } from '../interfaces/UserInfo';
 
 const Tab3: React.FC = () => {
-  const [userInfo, setUserInfo] = useState({
+  const [userInfo, setUserInfo] = useState<UserInfo>({
     name: "Usuario no encontrado",
     login: "no-username",
     bio: "No se encuentra usuario",
