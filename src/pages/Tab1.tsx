@@ -42,12 +42,13 @@ const Tab1: React.FC = () => {
         <IonList>
           {repos.map((repo, index) => (
             <RepoItem
-              key={index}
+              key={repo.name + index}
               name={repo.name}
               description={repo.description}
               imageUrl={repo.imageUrl}
               owner={repo.owner}
               language={repo.language}
+              onUpdate={loadRepos} 
             />
           ))}
         </IonList>

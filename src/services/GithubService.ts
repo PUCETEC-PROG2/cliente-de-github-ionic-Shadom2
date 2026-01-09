@@ -5,6 +5,7 @@ import { UserInfo } from "../interfaces/UserInfo";
 const GITHUB_API_URL = import.meta.env.VITE_GITHUB_API_URL; 
 const GITHUB_API_TOKEN = import.meta.env.VITE_GITHUB_API_TOKEN;
 
+// --- 1. GET: Obtener lista de repositorios ---
 export const fetchRepositories = async (): Promise<RepositoryItem[]> => {
   try {
     const response = await axios.get(`${GITHUB_API_URL}/user/repos`, {
@@ -34,12 +35,13 @@ export const fetchRepositories = async (): Promise<RepositoryItem[]> => {
   }
 };
 
+// --- 2. POST: Crear repositorio ---
 export const createRepository = async (name: string, description: string): Promise<void> => {
   try {
     const body = {
       name,
       description,
-      private: false, // Se puede cambiarlo a true si quieres repos privados
+      private: false,
     };
 
     const response = await axios.post(
@@ -57,9 +59,11 @@ export const createRepository = async (name: string, description: string): Promi
 
   } catch (error: any) {
     console.error("Error creating repository:", error.response?.data || error.message);
+    throw error; // Re-lanzamos el error para que la UI (Tab2) se entere y muestre el Toast rojo
   }
 };
 
+// --- 3. GET: Obtener Info de Usuario ---
 export const getUserInfo = async (): Promise<UserInfo | null> => {
   try {
     const response = await axios.get(`${GITHUB_API_URL}/user`,{
@@ -70,7 +74,58 @@ export const getUserInfo = async (): Promise<UserInfo | null> => {
     return response.data;
   } catch (error){
     console.error("Error recuperando usuario:", error);
-    alert("Error recuperando usuario");
     return null
   }
 }
+
+// --- 4. PATCH: Editar repositorio (NUEVO) ---
+// Devuelve true si tuvo éxito, false si falló
+export const updateRepository = async (
+  owner: string, 
+  repoName: string, 
+  newName?: string, 
+  newDescription?: string
+): Promise<boolean> => {
+  try {
+    // Solo enviamos los datos que tengan valor
+    const body: any = {};
+    if (newName) body.name = newName;
+    if (newDescription) body.description = newDescription;
+
+    await axios.patch(
+      `${GITHUB_API_URL}/repos/${owner}/${repoName}`,
+      body,
+      {
+        headers: {
+          Authorization: `Bearer ${GITHUB_API_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    
+    return true; // Éxito
+  } catch (error: any) {
+    console.error("Error updating repository:", error.response?.data || error.message);
+    return false; // Fallo
+  }
+};
+
+// --- 5. DELETE: Borrar repositorio (NUEVO) ---
+// Devuelve true si tuvo éxito, false si falló
+export const deleteRepository = async (owner: string, repoName: string): Promise<boolean> => {
+  try {
+    await axios.delete(
+      `${GITHUB_API_URL}/repos/${owner}/${repoName}`,
+      {
+        headers: {
+          Authorization: `Bearer ${GITHUB_API_TOKEN}`,
+        },
+      }
+    );
+
+    return true; // Éxito
+  } catch (error: any) {
+    console.error("Error deleting repository:", error.response?.data || error.message);
+    return false; // Fallo
+  }
+};
